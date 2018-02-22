@@ -33,32 +33,31 @@ def processMessage(self, author_id, messageText, thread_id, thread_type):
     if author_id != self.uid:
         if 'help' in messageText:
             txt = '''
-Help for StravaBot:
+                Help for StravaBot:
 
-Precede commands with \'Ghoul\', follow with desired command and [inputs].
+                Precede commands with \'Ghoul\', follow with desired command and [inputs].
 
-ghoul stats [runner] --Displays year-to-date Strava totals compared to the current chad.
+                ghoul stats [runner] --Displays year-to-date Strava totals compared to the current chad.
 
-ghoul is [runner] a chad? --Compares Strava totals of distance, time, and elevation to determine if the runner is the new chad
+                ghoul is [runner] a chad? --Compares Strava totals of distance, time, and elevation to determine if the runner is the new chad
 
-ghoul add lift [athlete] [lift type] [lift weight] --Adds one lift to the db
+                ghoul add lift [athlete] [lift type] [lift weight] --Adds one lift to the db
 
-ghoul get lift pr [athlete] [lift type] --Finds your pr for the specified lift type
+                ghoul get lift pr [athlete] [lift type] --Finds your pr for the specified lift type
 
-ghoul add runner [firstname] [stravaId]
-strava id is the set of numbers on your profile page in the form https://www.strava.com/athletes/[id]
+                ghoul add runner [firstname] [stravaId]
+                strava id is the set of numbers on your profile page in the form https://www.strava.com/athletes/[id]
 
-ghoul is [runner] a chad 
-works as before, compares to who is the current chad 
+                ghoul is [runner] a chad 
+                works as before, compares to who is the current chad 
 
-ghoul stats [runner]
-works similar to before, compares to current chad instead of always rex
+                ghoul stats [runner]
+                works similar to before, compares to current chad instead of always rex
 
-ghoul update chad 
-will update the current chad (expensive) and list the current one
-'''
-            self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
-
+                ghoul update chad 
+                will update the current chad (expensive) and list the current one
+                        '''
+                    self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
         elif 'stats' in messageText:
             messageArray = messageText.split(' ')
             runner_name = messageArray[2]
