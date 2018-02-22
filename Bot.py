@@ -57,7 +57,7 @@ def processMessage(self, author_id, messageText, thread_id, thread_type):
                 ghoul update chad 
                 will update the current chad (expensive) and list the current one
                         '''
-                    self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
         elif 'stats' in messageText:
             messageArray = messageText.split(' ')
             runner_name = messageArray[2]
