@@ -106,13 +106,13 @@ will update the current chad and list the current one
             getRunners(self, client.uid, ThreadType.USER)
         elif 'update chad' in messageText:
             findChad(self)
-            self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_chad)), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
             
 
 def sendStats(self, thread_id, thread_type, athlete, athleteName):
     rexStats = getStats(self.all_runners[self.current_running_chad])
     larryStats = getStats(athlete)
-    comparedStats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(self.current_chad, rexStats[0], athleteName, larryStats[0], self.current_chad, rexStats[1], rexStats[2],athleteName, larryStats[1], larryStats[2], self.current_chad, rexStats[3],athleteName, larryStats[3], self.current_chad, rexStats[4],athleteName, larryStats[4])
+    comparedStats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(self.current_running_chad, rexStats[0], athleteName, larryStats[0], self.current_running_chad, rexStats[1], rexStats[2],athleteName, larryStats[1], larryStats[2], self.current_running_chad, rexStats[3],athleteName, larryStats[3], self.current_running_chad, rexStats[4],athleteName, larryStats[4])
     self.send(Message(text = comparedStats), thread_id = thread_id, thread_type=thread_type)
 
 def findChad(self):
