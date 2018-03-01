@@ -69,7 +69,7 @@ will update the current chad and list the current one
             if name in self.all_lifters.keys():
                 liftingChadCheck(self, thread_id, thread_type, self.all_lifters[name], name)
             else:
-                self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
+                self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(name)), thread_id = thread_id, thread_type=thread_type)
                 
             # elif 'is kuoyuan a chad' in messageText:
             #         athleteName = 'Kuoyuan'
@@ -98,7 +98,6 @@ will update the current chad and list the current one
                 print('strava ID ^^^^')
                 for value in dict(self.all_runners).values():
                     print(value)
-               # print('LINE 98  {} strava  {}values'.format(strava_id, dict(self.all_runners).values()))
                 database_id = checkRunner(runner_name, strava_id)
                 if database_id != False:
                     self.all_runners = dict(data.get_runners_list())
@@ -167,7 +166,7 @@ def liftingChadCheck(self, thread_id, thread_type, athlete, athleteName):
 
 def runningChadCheck(self, thread_id, thread_type, athlete, athleteName):
     rexStats = getStats(self.all_runners[self.current_running_chad])
-    larryStats = getStats(athleteName)
+    larryStats = getStats(athlete)
     larryScore = 0
     response = 'I fucked up somehow, whoops'
     if (int(larryStats[1].replace(',','')) > int(rexStats[1].replace(',',''))):
