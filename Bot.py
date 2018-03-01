@@ -66,7 +66,7 @@ will update the current chad and list the current one
             name = messageArray[2]
             if name in self.all_runners.keys():
                 runningChadCheck(self, thread_id, thread_type, self.all_runners[name], name)
-            if name in self.all_athletes.keys():
+            if name in self.all_lifters.keys():
                 liftingChadCheck(self, thread_id, thread_type, self.all_lifters[name], name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
@@ -110,7 +110,7 @@ will update the current chad and list the current one
             
 
 def sendStats(self, thread_id, thread_type, athlete, athleteName):
-    rexStats = getStats(self.all_runners[self.current_chad])
+    rexStats = getStats(self.all_runners[self.current_running_chad])
     larryStats = getStats(athlete)
     comparedStats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(self.current_chad, rexStats[0], athleteName, larryStats[0], self.current_chad, rexStats[1], rexStats[2],athleteName, larryStats[1], larryStats[2], self.current_chad, rexStats[3],athleteName, larryStats[3], self.current_chad, rexStats[4],athleteName, larryStats[4])
     self.send(Message(text = comparedStats), thread_id = thread_id, thread_type=thread_type)
