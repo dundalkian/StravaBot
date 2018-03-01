@@ -14,7 +14,7 @@ password = os.environ['PASSWORD']
 
 class StravaBot(Client):
     all_runners = {}
-    all_lifters = {}
+    all_lifters = []
     current_running_chad = ''
     current_lifting_chad = ''
     def pmMe(self, txt):
@@ -58,7 +58,7 @@ will update the current chad and list the current one
             messageArray = messageText.split(' ')
             runner_name = messageArray[2]
             if runner_name in self.all_runners.keys():
-                sendStats(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
+                sendRunningStats(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
         elif ('is' and 'a chad') in messageText:
@@ -78,6 +78,28 @@ will update the current chad and list the current one
             # elif 'is kuoyuan a chad' in messageText:
             #         athleteName = 'Kuoyuan'
             #         chadCheck(self, thread_id, thread_type, Kuoyuan, athleteName)
+        elif 'lift report' in messageText:
+            FB_user_dict = StravaBot.fetchUserInfo(author_id)
+            FB_user = list(FB_user_dict.values())[0]
+            FB_user_name = FB_user.first_name
+            print('user\'s name is' + FB_user_name)
+            if FB_user_name not in self.all_lifters:
+                self.all_lifters.append(FB_user_name)
+
+            messageArray = messageText.split(' ')
+            num_of_lifts = 0
+            majorLifts = ['squat', 'dl', 'row', 'bench', 'ohp']
+            for lift in majorLifts:
+                if lift in messageArray:
+                    index = messageArray.index(lift)
+                    lift_name = lift
+                    lift_weight = messageArray[index+1]
+                    lift_id = data.insert_lift(FB_user_name, lift_name, lift_weight)
+                    num_of_lifts += 1
+            if num_of_lifts > 0:
+                self.send(Message(text = 'Nice gains brah.'), thread_id = thread_id, thread_type=thread_type)
+            else:
+                self.send(Message(text = 'Bro do you even lift?'), thread_id = thread_id, thread_type=thread_type)
         elif 'add lift' in messageText:
             messageArray = messageText.split(' ')
             athlete_name = messageArray[3]
@@ -112,7 +134,7 @@ will update the current chad and list the current one
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
             
 
-def sendStats(self, thread_id, thread_type, athlete, athleteName):
+def sendRunningStats(self, thread_id, thread_type, athlete, athleteName):
     rexStats = getStats(self.all_runners[self.current_running_chad])
     larryStats = getStats(athlete)
     comparedStats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(self.current_running_chad, rexStats[0], athleteName, larryStats[0], self.current_running_chad, rexStats[1], rexStats[2],athleteName, larryStats[1], larryStats[2], self.current_running_chad, rexStats[3],athleteName, larryStats[3], self.current_running_chad, rexStats[4],athleteName, larryStats[4])
