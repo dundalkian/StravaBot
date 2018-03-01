@@ -14,7 +14,9 @@ password = os.environ['PASSWORD']
 
 class StravaBot(Client):
     all_runners = {}
-    current_chad = ''
+    all_lifters = {}
+    current_running_chad = ''
+    current_lifting_chad = ''
     def pmMe(self, txt):
         self.send(Message(text = txt), thread_id = client.uid, thread_type=ThreadType.USER)
 
@@ -61,9 +63,11 @@ will update the current chad and list the current one
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
         elif ('is' and 'a chad') in messageText:
             messageArray = messageText.split(' ')
-            runner_name = messageArray[2]
-            if runner_name in self.all_runners.keys():
-                chadCheck(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
+            name = messageArray[2]
+            if name in self.all_runners.keys():
+                runningChadCheck(self, thread_id, thread_type, self.all_runners[name], name)
+            if name in self.all_athletes.keys():
+                liftingChadCheck(self, thread_id, thread_type, self.all_lifters[name], name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
                 
@@ -137,9 +141,33 @@ def findChad(self):
         print("Chad is {}".format(chadlist[0][0]))
         self.current_chad = chadlist[0][0]
 
-def chadCheck(self, thread_id, thread_type, athlete, athleteName):
-    rexStats = getStats(self.all_runners[self.current_chad])
-    larryStats = getStats(athlete)
+def liftingChadCheck(self, thread_id, thread_type, athlete, athleteName):
+    chadStats = data.get_lift_stats(self.current_lifting_chad)
+    virginStats = data.get_lift_stats(athleteName)
+    virginScore = 0
+    response = 'I fucked up somehow, whoops'
+    if virginStats[0] > chadStats[0]:
+        virginScore = virginScore + 1
+    if virginStats[1] > chadStats[1]:
+        virginScore = virginScore + 1
+    if virginStats[2] > chadStats[2]:
+        virginScore = virginScore + 1
+    if virginStats[3] > chadStats[3]:
+        virginScore = virginScore + 1
+    if virginStats[4] > chadStats[4]:
+        virginScore = virginScore + 1
+    if virginScore == 5:
+        response = 'Yes, {} is currently ahead in {}/5 lifts.'.format(athleteName, virginScore)
+    else:
+        response = 'Not yet, {} is currently ahead in {}/5 lifts.'.format(athleteName, virginScore)
+    if athleteName == self.current_lifting_chad:
+        response = '{} is the current lifting chad.'.format(athleteName)
+
+    self.send(Message(text = response), thread_id = thread_id, thread_type=thread_type)
+
+def runningChadCheck(self, thread_id, thread_type, athlete, athleteName):
+    rexStats = getStats(self.all_runners[self.current_running_chad])
+    larryStats = getStats(athleteName)
     larryScore = 0
     response = 'I fucked up somehow, whoops'
     if (int(larryStats[1].replace(',','')) > int(rexStats[1].replace(',',''))):
@@ -149,9 +177,12 @@ def chadCheck(self, thread_id, thread_type, athlete, athleteName):
     if (int(larryStats[3].replace(',','')) > int(rexStats[3].replace(',',''))):
         larryScore = larryScore + 1
     if larryScore == 3:
-        response = 'Yes, {} is currently ahead in {}/3 categories'.format(athleteName, larryScore)
+        response = 'Yes, {} is currently ahead in {}/3 categories.'.format(athleteName, larryScore)
     else:
-        response = 'Not yet, {} is currently ahead in {}/3 categories'.format(athleteName, larryScore)
+        response = 'Not yet, {} is currently ahead in {}/3 categories.'.format(athleteName, larryScore)
+    if athleteName == self.current_running_chad:
+        response = '{} is the current running chad.'.format(athleteName)
+
     self.send(Message(text = response), thread_id = thread_id, thread_type=thread_type)
 
 def getRunners(self, thread_id, thread_type):

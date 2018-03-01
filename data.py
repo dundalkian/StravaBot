@@ -255,3 +255,9 @@ def get_runners_list():
 
     return(all_runners)
 
+def get_lift_stats(athlete_name):
+    major_lifts = ['squat', 'dl', 'row', 'bench', 'ohp']
+    lift_prs = []
+    for lift in major_lifts:
+        lift_prs.append(get_lift_pr(athlete_name, lift))
+    return lift_prs
