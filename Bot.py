@@ -14,7 +14,7 @@ password = os.environ['PASSWORD']
 
 class StravaBot(Client):
     all_runners = {}
-    all_lifters = []
+    all_lifters = {}
     current_running_chad = ''
     current_lifting_chad = ''
     def pmMe(self, txt):
@@ -85,8 +85,8 @@ will update the current chad and list the current one
             FB_user = list(FB_user_dict.values())[0]
             FB_user_name = FB_user.first_name.lower()
             print('user\'s name is' + FB_user_name)
-            if FB_user_name not in self.all_lifters:
-                self.all_lifters.append(FB_user_name)
+            if FB_user_name not in self.all_lifters.keys():
+                self.all_lifters[FB_user_name] = calcWilksCoeff(self, author_id, thread_id)
 
             messageArray = messageText.split(' ')
             num_of_lifts = 0
@@ -167,6 +167,52 @@ def findChad(self):
     else:
         print("Chad is {}".format(chadlist[0][0]))
         self.current_running_chad = chadlist[0][0]
+
+def findLiftingChad(self):
+    bestSquat = [0,'']
+    bestBench = [0,'']
+    bestDl = [0,'']
+    for lifter in self.all_lifters.keys():
+        squat_adj = (data.get_lift_pr(lifter, 'squat'))*(self.all_lifters[lifter])
+        bench_adj = (data.get_lift_pr(lifter, 'bench'))*(self.all_lifters[lifter])
+        dl_adj = (data.get_lift_pr(lifter, 'dl'))*(self.all_lifters[lifter])
+        if squat_adj > bestSquat[0]:
+            bestSquat = [squat_adj, lifter]
+        if bench_adj > bestBench[0]:
+            bestBench = [bench_adj, lifter]
+        if dl_adj > bestDl[0]:
+            bestDl = [dl_adj, lifter]
+    chadFinalists = Counter([bestSquat[1], bestBench[1], bestDl[1]])
+    print(chadFinalists)
+    chadlist = list(chadFinalists.most_common(1))
+    print(chadlist)
+    if chadlist[0][1] is 1:
+        print('CHAD ONLY HAS ONE RECORD, USING DEADLIFT TO DETERMINE CHAD.')
+        self.current_lifting_chad = bestDl[1]
+    else:
+        print("Lifting Chad is {}".format(chadlist[0][0]))
+        self.current_lifting_chad = chadlist[0][0]    
+
+def calcWilksCoeff(self, uid, thread_id):
+    a=-216.0475144
+    b=16.2606339
+    c=-0.002388645
+    d=-0.00113732
+    e=7.01863E-06
+    f=-1.291E-08
+
+    FB_group = StravaBot.fetchGroupInfo(self, thread_id)
+    nicknames_dict = list(FB_group.values())[0].nicknames
+    nickname = nicknames_dict[uid]
+    nicknameArray = nickname.split(' ')
+    flag = 'lbs,'
+    if flag in nicknameArray:
+        weight_lbs = flag.index(flag) - 1
+        x = float(weight_lbs)*.453592
+        COEFF = 500.0/(a + b*x + c*(x**2) + d*(x**3) + e*(x**4) + f*(x**5))
+        return COEFF
+    else:
+        return False
 
 def liftingChadCheck(self, thread_id, thread_type, athlete, athleteName):
     chadStats = data.get_lift_stats(self.current_lifting_chad)
