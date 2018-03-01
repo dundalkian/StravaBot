@@ -79,7 +79,7 @@ will update the current chad and list the current one
             #         athleteName = 'Kuoyuan'
             #         chadCheck(self, thread_id, thread_type, Kuoyuan, athleteName)
         elif 'lift report' in messageText:
-            FB_user_dict = StravaBot.fetchUserInfo(author_id)
+            FB_user_dict = StravaBot.fetchUserInfo(self, author_id)
             FB_user = list(FB_user_dict.values())[0]
             FB_user_name = FB_user.first_name
             print('user\'s name is' + FB_user_name)
