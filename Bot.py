@@ -64,12 +64,16 @@ will update the current chad and list the current one
         elif ('is' and 'a chad') in messageText:
             messageArray = messageText.split(' ')
             name = messageArray[2]
+            lifter = False
+            runner = False
             if name in self.all_runners.keys():
+                runner = True
                 runningChadCheck(self, thread_id, thread_type, self.all_runners[name], name)
             if name in self.all_lifters.keys():
+                lifter = True
                 liftingChadCheck(self, thread_id, thread_type, self.all_lifters[name], name)
-            else:
-                self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(name)), thread_id = thread_id, thread_type=thread_type)
+            if (not runner and not lifter):
+                self.send(Message(text ='Looks like {} isn\'t in either system. :/'.format(name)), thread_id = thread_id, thread_type=thread_type)
                 
             # elif 'is kuoyuan a chad' in messageText:
             #         athleteName = 'Kuoyuan'
