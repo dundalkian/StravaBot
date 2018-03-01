@@ -136,10 +136,10 @@ def findChad(self):
     print(chadlist)
     if chadlist[0][1] is 1:
         print('CHAD ONLY HAS ONE RECORD, USING DISTANCE TO DETERMINE CHAD.')
-        self.current_chad = bestDistance[1]
+        self.current_running_chad = bestDistance[1]
     else:
         print("Chad is {}".format(chadlist[0][0]))
-        self.current_chad = chadlist[0][0]
+        self.current_running_chad = chadlist[0][0]
 
 def liftingChadCheck(self, thread_id, thread_type, athlete, athleteName):
     chadStats = data.get_lift_stats(self.current_lifting_chad)
