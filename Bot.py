@@ -81,7 +81,7 @@ will update the current chad and list the current one
         elif 'lift report' in messageText:
             FB_user_dict = StravaBot.fetchUserInfo(self, author_id)
             FB_user = list(FB_user_dict.values())[0]
-            FB_user_name = FB_user.first_name
+            FB_user_name = FB_user.first_name.lower()
             print('user\'s name is' + FB_user_name)
             if FB_user_name not in self.all_lifters:
                 self.all_lifters.append(FB_user_name)
