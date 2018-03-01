@@ -41,6 +41,8 @@ Precede commands with \'Ghoul\', follow with desired command and [inputs].
 
 ghoul stats [runner] --Displays year-to-date Strava totals compared to the current chad.
 
+ghoul lift report [lift] [weight] [lift] [weight] --Lifts are [bench, squat, row, dl, ohp] per suggestion 
+
 ghoul is [runner] a chad? --Compares Strava totals of distance, time, and elevation to determine if the runner is the new chad
 
 ghoul add lift [athlete] [lift type] [lift weight] --Adds one lift to the db
