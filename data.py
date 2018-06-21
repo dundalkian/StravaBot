@@ -56,6 +56,7 @@ def connect():
             conn.close()
             print('Database connection closed.')
 
+''' (For reference and if I blow up prod db :yikes:)
 def insert_tables():
     commands = (
             """
@@ -97,33 +98,7 @@ def insert_tables():
     finally:
         if conn is not None:
             conn.close()
-
-def insert_athlete(athlete_name):
-    sql = """INSERT INTO athletes(athlete_name) VALUES(%s) RETURNING athlete_id;"""
-    conn = None
-    athlete_id = None
-    try:
-        # read database configuration
-        params = config()
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect(**params)
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the INSERT statement
-        cur.execute(sql, (athlete_name,))
-        # get the generated id back
-        athlete_id = cur.fetchone()[0]
-        # commit the changes to the database
-        conn.commit()
-        # close communication with the database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
- 
-    return athlete_id
+'''
 
 def insert_runner(runner_name, runner_strava_id):
     sql = """INSERT INTO runners (runner_name, runner_strava_id) VALUES(%s, %s) RETURNING runner_id;"""
@@ -152,87 +127,6 @@ def insert_runner(runner_name, runner_strava_id):
  
     return runner_id
 
-def insert_lift_types(lift_name):
-    sql = """INSERT INTO lift_types(lift_name) VALUES(%s) RETURNING lift_id;"""
-    conn = None
-    lift_type_id = None
-    try:
-        # read database configuration
-        params = config()
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect(**params)
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the INSERT statement
-        cur.execute(sql, (lift_name,))
-        # get the generated id back
-        lift_type_id = cur.fetchone()[0]
-        # commit the changes to the database
-        conn.commit()
-        # close communication with the database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
- 
-    return lift_type_id
-
-def insert_lift(athlete_name, lift_name, lift_weight):
-    sql = """INSERT INTO lifts (athlete_name, lift_name, lift_weight) VALUES(%s, %s, %s) RETURNING lift_id;"""
-    conn = None
-    lift_id = None
-    try:
-        # read database configuration
-        params = config()
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect(**params)
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the INSERT statement
-        cur.execute(sql, (athlete_name, lift_name, lift_weight))
-        # get the generated id back
-        lift_id = cur.fetchone()[0]
-        # commit the changes to the database
-        conn.commit()
-        # close communication with the database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
- 
-    return lift_id
-
-def get_lift_pr(athlete_name, lift_name):
-    """ query data from the vendors table """
-    conn = None
-    try:
-        params = config()
-        conn = psycopg2.connect(**params)
-        cur = conn.cursor()
-        cur.execute("SELECT lift_weight FROM lifts WHERE athlete_name=(%s) AND lift_name=(%s) ORDER BY lift_id;", (athlete_name, lift_name))
-        print("The number of lifts: ", cur.rowcount)
-        row = cur.fetchone()
-
-        pr = 0
-        while row is not None:
-            if row[0] > pr:
-                pr=row[0]
-                print(pr)
-            print(row)
-            row = cur.fetchone()
- 
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-    return pr
-
 def get_runners_list():
     """Get list of ALL runners and Strava Id's"""
     conn = None
@@ -254,10 +148,3 @@ def get_runners_list():
             conn.close()
 
     return(all_runners)
-
-def get_lift_stats(athlete_name):
-    major_lifts = ['squat', 'dl', 'row', 'bench', 'ohp']
-    lift_prs = []
-    for lift in major_lifts:
-        lift_prs.append(get_lift_pr(athlete_name, lift))
-    return lift_prs
