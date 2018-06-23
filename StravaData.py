@@ -30,8 +30,16 @@ def get_weekly_stats():
     # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     driver.quit()
     weekly_stats_string = ""
+    km_2_mi = 0.621371
+    club_total_distance = 0.0
     for element in leaderboard_elements:
-        weekly_stats_string += "{}: {}\n".format(element[1],element[2])
+        distance_str = element[2].split(' ')
+        miles = float(distance_str[0])*km_2_mi
+        distance_str = "{:.1f} mi".format(miles)
+        club_total_distance += miles
+        weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
+
+    weekly_stats_string += "\n{:.1f} mi".format(club_total_distance)
     return weekly_stats_string
 
 
