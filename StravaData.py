@@ -1,4 +1,4 @@
-from selenium import webdriver
+from selenium import webdriver, Options
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import urllib3
@@ -11,7 +11,11 @@ club_url="https://www.strava.com/clubs/A0BP"
 
 
 def get_weekly_stats():
-    driver = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.binary_location = GOOGLE_CHROME_BIN
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
     driver.get(club_url)
     leaderboard = driver.find_element_by_xpath("//table[@class='dense striped sortable']")
     leaderboard_elements = []
