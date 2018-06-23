@@ -39,7 +39,7 @@ def get_weekly_stats():
         club_total_distance += miles
         weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
 
-    weekly_stats_string += "\n{:.1f} mi".format(club_total_distance)
+    weekly_stats_string += "\nClub Total Miles: {:.1f} mi".format(club_total_distance)
     return weekly_stats_string
 
 
