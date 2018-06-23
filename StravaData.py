@@ -1,12 +1,13 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 import urllib3
 import data
 import re
 import os
-
+import time 
 ## Config ##
 club_url="https://www.strava.com/clubs/A0BP"
 ## ##
@@ -31,6 +32,31 @@ def get_weekly_stats():
     driver.quit()
     return leaderboard_elements
 
+def get_last_weekly_stats():
+    chrome_options = Options()
+    #chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver.get(club_url) 
+    path = "/html/body/div[2]/div[2]/div[4]/div[1]/div[2]/div[2]/ul/li[1]/span"
+    button = driver.find_element_by_xpath(path)
+    actions = ActionChains(driver)
+    actions.move_to_element(button)
+    actions.click(button)
+    actions.perform()
+    actions.pause(5)
+    leaderboard = driver.find_element_by_xpath("//table[@class='dense striped sortable']")
+    leaderboard_elements = []
+    for row in leaderboard.find_elements_by_tag_name("tr"):
+        leaderboard_elements.append(re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n', row.text))
+    # Header information of table, will also throw an error if no table exists
+    leaderboard_elements.pop(0) 
+    # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
+    driver.quit()
+    return leaderboard_elements
 
 """
 weekly_stats_string = ""
@@ -50,7 +76,7 @@ weekly_stats_string = ""
 
 
 
-
+print(get_last_weekly_stats())
 
 
 
