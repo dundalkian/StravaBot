@@ -53,7 +53,7 @@ ghoul update chad
 ghoul week
 --displays the current leaderboard from the A0BP strava club 
 
-ghoul last week
+--NOT IMPLEMENTED-- ghoul last week --NOT IMPLEMENTED--
 --displays last week's leaderboard from the A0BP strava club
 '''
             self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)

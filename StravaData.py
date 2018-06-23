@@ -13,7 +13,6 @@ club_url="https://www.strava.com/clubs/A0BP"
 
 
 def get_weekly_stats():
-    
     chrome_options = Options()
     chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
     chrome_options.add_argument('--headless')
@@ -30,9 +29,10 @@ def get_weekly_stats():
     leaderboard_elements.pop(0) 
     # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     driver.quit()
-    return leaderboard_elements
-
-
+    weekly_stats_string = ""
+    for element in leaderboard_elements:
+        weekly_stats_string += "{}: {}\n".format(element[1],element[2])
+    return weekly_stats_string
 
 
 
