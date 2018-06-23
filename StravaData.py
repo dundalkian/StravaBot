@@ -76,7 +76,7 @@ weekly_stats_string = ""
 
 
 
-print(get_last_weekly_stats())
+#print(get_last_weekly_stats())
 
 
 
