@@ -14,10 +14,10 @@ club_url="https://www.strava.com/clubs/A0BP"
 
 def get_weekly_stats():
     chrome_options = Options()
-    chrome_options.binary_location = os.environ('GOOGLE_CHROME_BIN')
+    chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--no-sandbox')
-    driver = webdriver.Chrome(executable_path=os.environ('CHROMEDRIVER_PATH'), chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path=os.environ['CHROMEDRIVER_PATH'], chrome_options=chrome_options)
     driver.get(club_url)
     leaderboard = driver.find_element_by_xpath("//table[@class='dense striped sortable']")
     leaderboard_elements = []
