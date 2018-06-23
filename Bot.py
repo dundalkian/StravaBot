@@ -58,9 +58,8 @@ ghoul week
 '''
             self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
         elif re.search("(?i)stats",messageText):
-            runner_name = re.findall("(?<=\bstats\s)(\w+)",messageText)
-            print(type(runner_name))
-            print(runner_name)
+            print(messageText)
+            runner_name = re.findall("(?<=\bstats\s)(\w+)", messageText)
             if runner_name in self.all_runners.keys():
                 sendRunningStats(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
             else:
