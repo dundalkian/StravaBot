@@ -13,8 +13,10 @@ club_url="https://www.strava.com/clubs/A0BP"
 
 
 def get_weekly_stats():
+    
     chrome_options = Options()
     chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
+    chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
