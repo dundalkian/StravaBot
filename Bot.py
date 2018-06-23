@@ -1,6 +1,8 @@
 import json
 import os
 import time
+import datetime
+import threading
 from collections import Counter
 import re
 
@@ -66,14 +68,14 @@ ghoul week
                 sendRunningStats(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
-        elif re.search("is (\w*?) a chad", messageText):
+        elif re.search("(?i)is (\w*?) a chad", messageText):
             name = re.findall("is (\w*?) a chad", messageText)[0]
             if name in self.all_runners.keys():
                 runningChadCheck(self, thread_id, thread_type, self.all_runners[name], name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(name)), thread_id = thread_id, thread_type=thread_type)
 
-        elif 'add runner' in messageText:
+        elif '(?i)add runner' in messageText:
             messageArray = messageText.split(' ')
             runner_name = messageArray[3]
             strava_id = messageArray[4]
@@ -89,11 +91,23 @@ ghoul week
                     self.all_runners = dict(data.get_runners_list())
                     self.send(Message(text = 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)), thread_id = thread_id, thread_type=thread_type)
             getRunners(self, client.uid, ThreadType.USER)
-        elif 'update chad' in messageText:
+        elif '(?i)update chad' in messageText:
             findChad(self)
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
-        elif re.search("ghoul week", messageText):
-            self.send(Message(text = print_weekly_leaderboard()), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul week
+        elif re.search("(?i)week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table())), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul get week
+        elif re.search("(?i)get week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table(update=True))), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul last week
+        elif re.search("(?i)last week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table())), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul get last week (not really intended to be used except for testing and if someone posts a run at 12:01)
+        elif re.search("(?i)get last week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table(update=True))), thread_id = thread_id, thread_type=thread_type)
+        
+
 
 def sendRunningStats(self, thread_id, thread_type, athlete, athleteName):
     rexStats = getStats(self.all_runners[self.current_running_chad])
@@ -165,8 +179,9 @@ def startupClient(email, password):
         session.write(json.dumps(client.getSession()))
     return client
 
-def print_weekly_leaderboard():
-    leaderboard_elements = data.get_weekly_table()
+# Pass in any of [get/update]_[weekly/last_weekly]_table()
+def print_weekly_leaderboard(desired_table):
+    leaderboard_elements = desired_table()
     weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0
@@ -180,7 +195,26 @@ def print_weekly_leaderboard():
     weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
     return weekly_stats_string
 
+
+
+
+
+
+
+### Reving up the engines ###
+
+next_call = time.time()
+def update_loop():
+    global next_call
+    print("Starting timer to next loop: {}".format(datetime.datetime.now()))
+    data.update_weekly_table()
+    data.update_last_weekly_table()
+    next_call = next_call + 900
+    threading.Timer(next_call-time.time(), update_loop).start()
+
+
 client = startupClient(email, password)
 getRunners(client, client.uid, ThreadType.USER)
 findChad(client)
+update_loop()
 client.listen()

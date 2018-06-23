@@ -59,7 +59,7 @@ def connect():
 # (For reference and if I blow up prod db :yikes:)
 def insert_tables():
     command = """
-            CREATE TABLE weekly_stats (
+            CREATE TABLE last_weekly_stats (
                 rank SERIAL PRIMARY KEY,
                 athlete VARCHAR(255) NOT NULL,
                 distance VARCHAR(255) NOT NULL,
@@ -116,7 +116,62 @@ def update_weekly_table():
  
     return True
 
-def get_weekly_table():
+def update_last_weekly_table():
+    remove_stats_sql = """DELETE FROM last_weekly_stats;"""
+    new_stats_sql = """INSERT INTO last_weekly_stats (rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
+    conn = None
+    last_weekly_stats = StravaData.get_last_weekly_stats()
+    try:
+        # read database configuration
+        params = config()
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(**params)
+        # create a new cursor
+        cur = conn.cursor()
+        # delete old records
+        cur.execute(remove_stats_sql)
+        # execute the INSERT statement
+        for runner_stats in last_weekly_stats:
+            cur.execute(new_stats_sql, runner_stats)
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+ 
+    return True
+
+def get_last_weekly_table(update=False):
+    if update:
+        update_last_weekly_table()
+    
+    conn = None
+    try:
+        params = config()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        cur.execute("SELECT rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain FROM last_weekly_stats;")
+        last_weekly_table = cur.fetchall()
+
+        print(last_weekly_table)
+ 
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return(last_weekly_table)    
+
+def get_weekly_table(update=False):
+    if update:
+        update_weekly_table()
+    
     conn = None
     try:
         params = config()
@@ -184,4 +239,3 @@ def get_runners_list():
             conn.close()
 
     return(all_runners)
-
