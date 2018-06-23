@@ -62,6 +62,7 @@ ghoul week
             iterator = re.finditer(r"(?<=\bstats\s)(\w+)", messageText)
             match = next(iterator)
             if match[0] in self.all_runners.keys():
+                runner_name = match[0]
                 sendRunningStats(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
