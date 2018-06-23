@@ -11,15 +11,15 @@ import os
 club_url="https://www.strava.com/clubs/A0BP"
 ## ##
 
-
+# executable_path=os.environ['CHROMEDRIVER_PATH'], 
 def get_weekly_stats():
     chrome_options = Options()
-    chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
+    #chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(executable_path=os.environ['CHROMEDRIVER_PATH'], chrome_options=chrome_options)
+    driver = webdriver.Chrome(chrome_options=chrome_options)
     driver.get(club_url)
     leaderboard = driver.find_element_by_xpath("//table[@class='dense striped sortable']")
     leaderboard_elements = []
@@ -29,7 +29,11 @@ def get_weekly_stats():
     leaderboard_elements.pop(0) 
     # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     driver.quit()
-    weekly_stats_string = ""
+    return leaderboard_elements
+
+
+"""
+weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0
     for element in leaderboard_elements:
@@ -39,11 +43,8 @@ def get_weekly_stats():
         club_total_distance += miles
         weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
 
-    weekly_stats_string += "\nClub Total Miles: {:.1f} mi".format(club_total_distance)
-    return weekly_stats_string
-
-
-
+    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
+"""
 
 
 

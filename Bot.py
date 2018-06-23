@@ -90,7 +90,7 @@ ghoul week
             findChad(self)
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
         elif re.search("ghoul week", messageText):
-            self.send(Message(text = get_weekly_stats()), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard()), thread_id = thread_id, thread_type=thread_type)
 
 def sendRunningStats(self, thread_id, thread_type, athlete, athleteName):
     rexStats = getStats(self.all_runners[self.current_running_chad])
@@ -162,7 +162,20 @@ def startupClient(email, password):
         session.write(json.dumps(client.getSession()))
     return client
 
+def print_weekly_leaderboard():
+    leaderboard_elements = data.get_weekly_table()
+    weekly_stats_string = ""
+    km_2_mi = 0.621371
+    club_total_distance = 0.0
+    for element in leaderboard_elements:
+        distance_str = element[2].split(' ')
+        miles = float(distance_str[0])*km_2_mi
+        distance_str = "{:.1f} mi".format(miles)
+        club_total_distance += miles
+        weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
 
+    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
+    return weekly_stats_string
 
 client = startupClient(email, password)
 getRunners(client, client.uid, ThreadType.USER)
