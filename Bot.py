@@ -94,18 +94,18 @@ ghoul week
         elif '(?i)update chad' in messageText:
             findChad(self)
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
-        # Ghoul week
-        elif re.search("(?i)week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
-        # Ghoul get week
-        elif re.search("(?i)get week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
-        # Ghoul last week
-        elif re.search("(?i)last week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul get last week (not really intended to be used except for testing and if someone posts a run at 12:01)
         elif re.search("(?i)get last week", messageText):
             self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul last week
+        elif re.search("(?i)last week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul get week
+        elif re.search("(?i)get week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul week
+        elif re.search("(?i)week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
         
 
 
