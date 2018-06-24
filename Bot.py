@@ -214,8 +214,9 @@ def update_loop():
         except Exception as e:
             print("Selenium failed, retrying, hopefully it works soon :/")
             continue
+        print("Selenium succeeded (maybe)")
         break
-    next_call = next_call + 60
+    next_call = next_call + 300
     threading.Timer(next_call-time.time(), update_loop).start()
 
 
