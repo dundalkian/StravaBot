@@ -209,7 +209,7 @@ def update_loop():
     print("Starting timer to next loop: {}".format(datetime.datetime.now()))
     data.update_weekly_table()
     data.update_last_weekly_table()
-    next_call = next_call + 900
+    next_call = next_call + 60
     threading.Timer(next_call-time.time(), update_loop).start()
 
 
