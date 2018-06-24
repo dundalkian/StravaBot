@@ -6,6 +6,7 @@ import threading
 from collections import Counter
 import re
 
+from prettytable import MSWORD_FRIENDLY
 from prettytable import PrettyTable
 from fbchat import Client, log
 from fbchat.models import Message, ThreadType
@@ -205,11 +206,12 @@ def print_weekly_leaderboard(last_week, update):
 #    return weekly_stats_string
     table.add_row(["Club Miles", "{:.1f} mi".format(club_total_distance)])
     if last_week:
-        table._title = "Last Week Leaderboard"
+        table.title = "Last Week Leaderboard"
+        table.set_style(MSWORD_FRIENDLY)
         return table.get_string()
     else:
-        table._title = "Week Leaderboard"
-        return table.get_string()
+        table.title = "Week Leaderboard"
+        return table
         
 
 
