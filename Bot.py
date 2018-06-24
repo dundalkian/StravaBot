@@ -183,6 +183,9 @@ def startupClient(email, password):
 
 # Pass in get_[weekly/last_weekly]_table() and whether to run an update first
 def print_weekly_leaderboard(last_week, update):
+    # Unicode fuckery
+    WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
+    WIDE_MAP[0x20] = 0x3000
     if last_week:
         leaderboard_elements = data.get_last_weekly_table(update)
     else:
@@ -208,9 +211,8 @@ def print_weekly_leaderboard(last_week, update):
     table.add_row(["Club Miles", "{:.1f} mi".format(club_total_distance)])
     if last_week:
         table.title = "Last Week Leaderboard"
-        table.set_style(MSWORD_FRIENDLY)
         print(table)
-        return table.get_string()
+        return str(table.get_string()).translate(WIDE_MAP)
     else:
         table.title = "Week Leaderboard"
         print(table)
