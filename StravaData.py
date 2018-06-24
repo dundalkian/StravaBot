@@ -52,6 +52,7 @@ def get_last_weekly_stats():
     cookie_button.click()
     button = driver.find_element_by_css_selector(selector)
     button.click()
+    
     leaderboard = driver.find_element_by_css_selector("body > div.view > div.page.container > div:nth-child(4) > div.spans11 > div.leaderboard-page.tab-content > div:nth-child(2) > div.leaderboard > table")
     leaderboard_elements = []
     for row in leaderboard.find_elements_by_tag_name("tr"):

@@ -207,8 +207,14 @@ next_call = time.time()
 def update_loop():
     global next_call
     print("Starting timer to next loop: {}".format(datetime.datetime.now()))
-    data.update_weekly_table()
-    data.update_last_weekly_table()
+    while True:
+        try:
+            data.update_weekly_table()
+            data.update_last_weekly_table()
+        except Exception as e:
+            print("Selenium failed, retrying, hopefully it works soon :/")
+            continue
+        break
     next_call = next_call + 60
     threading.Timer(next_call-time.time(), update_loop).start()
 
