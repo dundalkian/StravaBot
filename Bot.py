@@ -38,7 +38,7 @@ def processMessage(self, author_id, messageText, thread_id, thread_type):
             txt = '''
 Help for StravaBot:
 
-Precede commands with \'Ghoul\', follow with desired command and [inputs].
+Precede commands with \'Ghoul\', follow with: commands, [inputs], (options).
 
 ghoul stats [runner]
 --Displays year-to-date Strava totals compared to the current chad.
@@ -50,13 +50,13 @@ ghoul add runner [firstname] [stravaId]
 --strava id is the set of numbers on your profile page in the form https://www.strava.com/athletes/[stravaId]
 
 ghoul update chad
---will update the current chad and list the current one
+--will update the current chad and list the current one.
 
-ghoul week
---displays the current leaderboard from the A0BP strava club 
+ghoul (get) week
+--displays this week's leaderboard from the A0BP strava club. (get) forces an update of the stats.  
 
---NOT IMPLEMENTED-- ghoul last week --NOT IMPLEMENTED--
---displays last week's leaderboard from the A0BP strava club
+ghoul (get) last week
+--displays last week's leaderboard from the A0BP strava club. (get) forces an update of the stats.
 '''
             self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
         elif re.search("(?i)stats",messageText):
