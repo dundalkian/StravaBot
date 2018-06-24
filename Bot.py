@@ -203,7 +203,7 @@ def print_weekly_leaderboard(last_week, update):
 
 #    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
 #    return weekly_stats_string
-    table.add_row(["",""])
+    table.add_row([""])
     table.add_row(["Club Miles", "{:.1f} mi".format(club_total_distance)])
     if last_week:
         return table.get_string(title="Last Week Leaderboard")
