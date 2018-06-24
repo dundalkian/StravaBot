@@ -96,16 +96,16 @@ ghoul week
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul week
         elif re.search("(?i)week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table())), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul get week
         elif re.search("(?i)get week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table(update=True))), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul last week
         elif re.search("(?i)last week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table())), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul get last week (not really intended to be used except for testing and if someone posts a run at 12:01)
         elif re.search("(?i)get last week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table(update=True))), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
         
 
 
@@ -179,9 +179,9 @@ def startupClient(email, password):
         session.write(json.dumps(client.getSession()))
     return client
 
-# Pass in any of [get/update]_[weekly/last_weekly]_table()
-def print_weekly_leaderboard(desired_table):
-    leaderboard_elements = desired_table()
+# Pass in get_[weekly/last_weekly]_table() and whether to run an update first
+def print_weekly_leaderboard(desired_table, update):
+    leaderboard_elements = desired_table(update)
     weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0
