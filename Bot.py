@@ -1,13 +1,16 @@
 import json
 import os
 import time
+import datetime
+import threading
 from collections import Counter
+import re
 
 from fbchat import Client, log
-from fbchat.models import *
+from fbchat.models import Message, ThreadType
 
 import data
-from StravaData import checkRunner, getStats
+from StravaData import checkRunner, getStats, get_weekly_stats
 
 email = os.environ['EMAIL']
 password = os.environ['PASSWORD']
@@ -20,8 +23,8 @@ class StravaBot(Client):
 
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         if message_object.text is not None:
-            messageText = message_object.text.lower()
-            if 'ghoul' in messageText: 
+            messageText = message_object.text
+            if re.match("(?i)ghoul", messageText):
                 processMessage(self, author_id, messageText, thread_id, thread_type)
             else:
                 # Sends the data to the inherited onMessage, so that we can still see when a message is recieved
@@ -31,39 +34,48 @@ class StravaBot(Client):
 
 def processMessage(self, author_id, messageText, thread_id, thread_type):
     if author_id != self.uid:
-        if 'help' in messageText:
+        if re.search("(?i)help", messageText):
             txt = '''
 Help for StravaBot:
 
-Precede commands with \'Ghoul\', follow with desired command and [inputs].
+Precede commands with \'Ghoul\', follow with: commands, [inputs], (options).
 
-ghoul stats [runner] --Displays year-to-date Strava totals compared to the current chad.
+ghoul stats [runner]
+--Displays year-to-date Strava totals compared to the current chad.
 
-ghoul is [runner] a chad? --Compares Strava totals of distance, time, and elevation to determine if the runner is the new chad
+ghoul is [runner] a chad?
+--Compares Strava totals of distance, time, and elevation to determine if the runner is the new chad
 
 ghoul add runner [firstname] [stravaId]
-strava id is the set of numbers on your profile page in the form https://www.strava.com/athletes/[stravaId]
+--strava id is the set of numbers on your profile page in the form https://www.strava.com/athletes/[stravaId]
 
-ghoul update chad 
-will update the current chad and list the current one
+ghoul update chad
+--will update the current chad and list the current one.
+
+ghoul (get) week
+--displays this week's leaderboard from the A0BP strava club. (get) forces an update of the stats.  
+
+ghoul (get) last week
+--displays last week's leaderboard from the A0BP strava club. (get) forces an update of the stats.
 '''
             self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
-        elif 'stats' in messageText:
-            messageArray = messageText.split(' ')
-            runner_name = messageArray[2]
-            if runner_name in self.all_runners.keys():
+        elif re.search("(?i)stats",messageText):
+            print(messageText)
+            iterator = re.finditer(r"(?<=\bstats\s)(\w+)", messageText)
+            match = next(iterator)
+            runner_name = match[0]
+            if match[0] in self.all_runners.keys():
                 sendRunningStats(self, thread_id, thread_type, self.all_runners[runner_name], runner_name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(runner_name)), thread_id = thread_id, thread_type=thread_type)
-        elif ('is' and 'a chad') in messageText:
-            messageArray = messageText.split(' ')
-            name = messageArray[2]
+        elif re.search("(?i)is (\w*?) a chad", messageText):
+            name = re.findall("is (\w*?) a chad", messageText)[0]
             if name in self.all_runners.keys():
                 runningChadCheck(self, thread_id, thread_type, self.all_runners[name], name)
             else:
                 self.send(Message(text ='Looks like {} isn\'t in the system. :/'.format(name)), thread_id = thread_id, thread_type=thread_type)
-                
-        elif 'add runner' in messageText:
+
+        elif '(?i)add runner' in messageText:
             messageArray = messageText.split(' ')
             runner_name = messageArray[3]
             strava_id = messageArray[4]
@@ -79,10 +91,23 @@ will update the current chad and list the current one
                     self.all_runners = dict(data.get_runners_list())
                     self.send(Message(text = 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)), thread_id = thread_id, thread_type=thread_type)
             getRunners(self, client.uid, ThreadType.USER)
-        elif 'update chad' in messageText:
+        elif '(?i)update chad' in messageText:
             findChad(self)
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
-            
+        # Ghoul get last week (not really intended to be used except for testing and if someone posts a run at 12:01)
+        elif re.search("(?i)get last week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul last week
+        elif re.search("(?i)last week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul get week
+        elif re.search("(?i)get week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
+        # Ghoul week
+        elif re.search("(?i)week", messageText):
+            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
+        
+
 
 def sendRunningStats(self, thread_id, thread_type, athlete, athleteName):
     rexStats = getStats(self.all_runners[self.current_running_chad])
@@ -141,7 +166,6 @@ def getRunners(self, thread_id, thread_type):
     self.all_runners = dict(runners_list)
     print(self.all_runners)
     self.send(Message(text = 'Refreshed runners list.'), thread_id = thread_id, thread_type=thread_type)
-   
 
 def startupClient(email, password):
     try:
@@ -155,9 +179,42 @@ def startupClient(email, password):
         session.write(json.dumps(client.getSession()))
     return client
 
+# Pass in get_[weekly/last_weekly]_table() and whether to run an update first
+def print_weekly_leaderboard(desired_table, update):
+    leaderboard_elements = desired_table(update)
+    weekly_stats_string = ""
+    km_2_mi = 0.621371
+    club_total_distance = 0.0
+    for element in leaderboard_elements:
+        distance_str = element[2].split(' ')
+        miles = float(distance_str[0])*km_2_mi
+        distance_str = "{:.1f} mi".format(miles)
+        club_total_distance += miles
+        weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
+
+    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
+    return weekly_stats_string
+
+
+
+
+
+
+
+### Reving up the engines ###
+
+next_call = time.time()
+def update_loop():
+    global next_call
+    print("Starting timer to next loop: {}".format(datetime.datetime.now()))
+    data.update_weekly_table()
+    data.update_last_weekly_table()
+    next_call = next_call + 900
+    threading.Timer(next_call-time.time(), update_loop).start()
 
 
 client = startupClient(email, password)
 getRunners(client, client.uid, ThreadType.USER)
 findChad(client)
+update_loop()
 client.listen()
