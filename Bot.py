@@ -6,7 +6,6 @@ import threading
 from collections import Counter
 import re
 
-from prettytable import MSWORD_FRIENDLY
 from prettytable import PrettyTable
 from fbchat import Client, log
 from fbchat.models import Message, ThreadType
@@ -183,41 +182,24 @@ def startupClient(email, password):
 
 # Pass in get_[weekly/last_weekly]_table() and whether to run an update first
 def print_weekly_leaderboard(last_week, update):
-    # Unicode fuckery
-    WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
-    WIDE_MAP[0x20] = 0x3000
     if last_week:
         leaderboard_elements = data.get_last_weekly_table(update)
     else:
         leaderboard_elements = data.get_weekly_table(update)
-    #weekly_stats_string = ""
+    weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0
-    table = PrettyTable(["Runner", "Distance"])
-    table.align["Runner"] = "l"
-    table.align["Distance"] = "r"
-    table.horizontal_char = "="
     for element in leaderboard_elements:
         distance_str = element[2].split(' ')
         miles = float(distance_str[0])*km_2_mi
         distance_str = "{:.1f} mi".format(miles)
-
         club_total_distance += miles
-        table.add_row([element[1], distance_str])
-        #weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
+        weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
 
-#    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
-#    return weekly_stats_string
-    table.add_row(["Club Miles", "{:.1f} mi".format(club_total_distance)])
-    if last_week:
-        table.title = "Last Week Leaderboard"
-        print(table)
-        return str(table.get_string()).translate(WIDE_MAP)
-    else:
-        table.title = "Week Leaderboard"
-        print(table)
-        return table
-        
+
+    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
+    return weekly_stats_string
+
 
 
 
