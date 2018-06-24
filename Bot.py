@@ -53,10 +53,10 @@ ghoul update chad
 --will update the current chad and list the current one.
 
 ghoul (get) week
---displays this week's leaderboard from the A0BP strava club. (get) forces an update of the stats.  
+--displays this week's leaderboard from the A0BP strava club. (get) forces update of stats.  
 
 ghoul (get) last week
---displays last week's leaderboard from the A0BP strava club. (get) forces an update of the stats.
+--displays last week's leaderboard from the A0BP strava club. (get) forces update of stats.
 '''
             self.send(Message(text = txt), thread_id = thread_id, thread_type=thread_type)
         elif re.search("(?i)stats",messageText):
