@@ -6,6 +6,7 @@ import threading
 from collections import Counter
 import re
 
+from prettytable import PrettyTable
 from fbchat import Client, log
 from fbchat.models import Message, ThreadType
 
@@ -96,16 +97,16 @@ ghoul (get) last week
             self.send(Message(text = 'Chad updated, running chad is {}'.format(self.current_running_chad)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul get last week (not really intended to be used except for testing and if someone posts a run at 12:01)
         elif re.search("(?i)get last week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(True, True)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul last week
         elif re.search("(?i)last week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_last_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(True, False)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul get week
         elif re.search("(?i)get week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, True)), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(False, True)), thread_id = thread_id, thread_type=thread_type)
         # Ghoul week
         elif re.search("(?i)week", messageText):
-            self.send(Message(text = print_weekly_leaderboard(data.get_weekly_table, False)), thread_id = thread_id, thread_type=thread_type)
+            self.send(Message(text = print_weekly_leaderboard(False, False)), thread_id = thread_id, thread_type=thread_type)
         
 
 
@@ -180,21 +181,34 @@ def startupClient(email, password):
     return client
 
 # Pass in get_[weekly/last_weekly]_table() and whether to run an update first
-def print_weekly_leaderboard(desired_table, update):
-    leaderboard_elements = desired_table(update)
-    weekly_stats_string = ""
+def print_weekly_leaderboard(last_week, update):
+    if last_week:
+        leaderboard_elements = data.get_last_weekly_table(update)
+    else:
+        leaderboard_elements = data.get_weekly_table(update)
+    #weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0
+    table = PrettyTable(["Runner", "Distance"])
+    table.align["Runner"] = "l"
+    table.align["Distance"] = "r"
     for element in leaderboard_elements:
         distance_str = element[2].split(' ')
         miles = float(distance_str[0])*km_2_mi
         distance_str = "{:.1f} mi".format(miles)
+
         club_total_distance += miles
-        weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
+        table.add_row([element[1], distance_str])
+        #weekly_stats_string += "{}: {}\n".format(element[1],distance_str)
 
-    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
-    return weekly_stats_string
 
+#    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
+#    return weekly_stats_string
+    if last_week:
+        return table.get_string(title="Last Week Leaderboard")
+    else:
+        return table.get_string(title="Week Leaderboard")
+        
 
 
 
