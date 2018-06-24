@@ -167,7 +167,7 @@ def getRunners(self, thread_id, thread_type):
     print(self.all_runners)
     self.send(Message(text = 'Refreshed runners list.'), thread_id = thread_id, thread_type=thread_type)
 
-def startupClient(email, password):
+def startupClient(email, password): # testing git alias
     try:
         with open("session.txt", "r") as session:
             session_cookies = json.loads(session.read())
