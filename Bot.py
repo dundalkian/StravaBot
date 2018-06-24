@@ -193,6 +193,7 @@ def print_weekly_leaderboard(last_week, update):
     table = PrettyTable(["Runner", "Distance"])
     table.align["Runner"] = "l"
     table.align["Distance"] = "r"
+    table.horizontal_char = "="
     for element in leaderboard_elements:
         distance_str = element[2].split(' ')
         miles = float(distance_str[0])*km_2_mi
