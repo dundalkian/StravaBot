@@ -208,9 +208,11 @@ def print_weekly_leaderboard(last_week, update):
     if last_week:
         table.title = "Last Week Leaderboard"
         table.set_style(MSWORD_FRIENDLY)
+        print(table)
         return table.get_string()
     else:
         table.title = "Week Leaderboard"
+        print(table)
         return table
         
 
