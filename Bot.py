@@ -186,6 +186,10 @@ def print_weekly_leaderboard(last_week, update):
         leaderboard_elements = data.get_last_weekly_table(update)
     else:
         leaderboard_elements = data.get_weekly_table(update)
+    try:
+        leaderboard_elements[0][4]
+    except IndexError as e:
+        return "The table does not exist yet, go run"
     weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0

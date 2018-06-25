@@ -29,7 +29,11 @@ def get_weekly_stats():
     for row in leaderboard.find_elements_by_tag_name("tr"):
         leaderboard_elements.append(re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n', row.text))
     # Header information of table, will also throw an error if no table exists
-    leaderboard_elements.pop(0) 
+    try:
+        leaderboard_elements.pop(0)
+    except IndexError as e:
+        print("Error reading table: {}".format(e))
+        return False
     # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     driver.quit()
     return leaderboard_elements

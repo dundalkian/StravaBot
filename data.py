@@ -92,27 +92,48 @@ def update_weekly_table():
     new_stats_sql = """INSERT INTO weekly_stats (rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
     conn = None
     weekly_stats = StravaData.get_weekly_stats()
-    try:
-        # read database configuration
-        params = config()
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect(**params)
-        # create a new cursor
-        cur = conn.cursor()
-        # delete old records
-        cur.execute(remove_stats_sql)
-        # execute the INSERT statement
-        for runner_stats in weekly_stats:
-            cur.execute(new_stats_sql, runner_stats)
-        # commit the changes to the database
-        conn.commit()
-        # close communication with the database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
+    if weekly_stats is False:
+        try:
+            # read database configuration
+            params = config()
+            # connect to the PostgreSQL database
+            conn = psycopg2.connect(**params)
+            # create a new cursor
+            cur = conn.cursor()
+            # delete old records
+            cur.execute(remove_stats_sql)
+            # commit the changes to the database
+            conn.commit()
+            # close communication with the database
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+            return False
+    else:
+        try:
+            # read database configuration
+            params = config()
+            # connect to the PostgreSQL database
+            conn = psycopg2.connect(**params)
+            # create a new cursor
+            cur = conn.cursor()
+            # delete old records
+            cur.execute(remove_stats_sql)
+            # execute the INSERT statement
+            for runner_stats in weekly_stats:
+                cur.execute(new_stats_sql, runner_stats)
+            # commit the changes to the database
+            conn.commit()
+            # close communication with the database
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
  
     return True
 
