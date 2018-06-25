@@ -205,7 +205,8 @@ def get_weekly_table(update=False):
  
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        print("Error in getting weekly table, 90 percent chance its monday and no one ran: {}".format(error))
+        return False
     finally:
         if conn is not None:
             conn.close()
