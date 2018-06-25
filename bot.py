@@ -200,12 +200,6 @@ def print_weekly_leaderboard(last_week, update):
     weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
     return weekly_stats_string
 
-
-
-
-
-
-
 ### Reving up the engines ###
 
 next_call = time.time()
@@ -224,7 +218,6 @@ def update_loop():
         break
     next_call = next_call + 300
     threading.Timer(next_call-time.time(), update_loop).start()
-
 
 client = startupClient(email, password)
 getRunners(client, client.uid, ThreadType.USER)
