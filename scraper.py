@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from bs4 import BeautifulSoup
 import urllib3
-import data
+import database
 import re
 import os
 import time 
@@ -15,7 +15,7 @@ import time
 club_url="https://www.strava.com/clubs/A0BP"
 ## ##
 
-def get_weekly_stats():
+def scrape_weekly_table():
     chrome_options = Options()
     chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
     chrome_options.add_argument('--headless')
@@ -25,16 +25,10 @@ def get_weekly_stats():
     driver = webdriver.Chrome(executable_path=os.environ['CHROMEDRIVER_PATH'], chrome_options=chrome_options)
     driver.get(club_url)
     leaderboard = driver.find_element_by_css_selector("body > div.view > div.page.container > div:nth-child(4) > div.spans11 > div.leaderboard-page.tab-content > div:nth-child(2) > div.leaderboard > table")
-    leaderboard_elements = []
-    for row in leaderboard.find_elements_by_tag_name("tr"):
-        leaderboard_elements.append(re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n', row.text))
-    # Header information of table, will also throw an error if no table exists
-    leaderboard_elements.pop(0) 
-    # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     driver.quit()
-    return leaderboard_elements
+    return leaderboard.find_elements_by_tag_name("tr")
 
-def get_last_weekly_stats():
+def scrape_last_weekly_table():
     chrome_options = Options()
     chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
     chrome_options.add_argument('--headless')
@@ -45,23 +39,18 @@ def get_last_weekly_stats():
 
     # This banner is in the way of clicking the last week button and idk how to scroll
     cookie_button_selector = "#stravaCookieBanner > div > button"
-    selector = "body > div.view > div.page.container > div:nth-child(4) > div.spans11 > div.leaderboard-page.tab-content > div:nth-child(2) > ul > li:nth-child(1) > span" 
+    last_week_button_selector = "body > div.view > div.page.container > div:nth-child(4) > div.spans11 > div.leaderboard-page.tab-content > div:nth-child(2) > ul > li:nth-child(1) > span" 
     driver.maximize_window()
     driver.get(club_url)
+    # Find the cookie banner close button and click it
     cookie_button = driver.find_element_by_css_selector(cookie_button_selector)
     cookie_button.click()
-    button = driver.find_element_by_css_selector(selector)
-    button.click()
-    
+    # Find the last week button and click it
+    button = driver.find_element_by_css_selector(last_week_button_selector)
+    button.click()    
     leaderboard = driver.find_element_by_css_selector("body > div.view > div.page.container > div:nth-child(4) > div.spans11 > div.leaderboard-page.tab-content > div:nth-child(2) > div.leaderboard > table")
-    leaderboard_elements = []
-    for row in leaderboard.find_elements_by_tag_name("tr"):
-        leaderboard_elements.append(re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|(?<=m) (?=--)|\\n', row.text))
-    # Header information of table, will also throw an error if no table exists
-    leaderboard_elements.pop(0) 
-    # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     driver.quit()
-    return leaderboard_elements
+    return leaderboard.find_elemens_by_tag_name("tr")
 
 """
 weekly_stats_string = ""

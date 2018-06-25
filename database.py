@@ -2,7 +2,6 @@ from urllib import parse
 import psycopg2
 from configparser import ConfigParser
 import os
-import StravaData
 
 def config(filename='database.ini', section='postgresql'):
     # create a parser

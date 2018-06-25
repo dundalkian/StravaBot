@@ -218,6 +218,7 @@ def update_loop():
             data.update_last_weekly_table()
         except Exception as e:
             print("Selenium failed, retrying, hopefully it works soon :/")
+            print(e)
             continue
         print("Selenium succeeded (maybe)")
         break
