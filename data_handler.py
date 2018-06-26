@@ -30,7 +30,7 @@ displays last week's leaderboard from the A0BP strava club. (get) forces update 
 def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
     if author_id != StravaBot.uid:
         if re.search("(?i)help", messageText):
-            StravaBot.send(Message(text = help_text), thread_id = thread_id, thread_type=thread_type)
+            return help_text
         elif re.search("(?i)stats",messageText):
             print(messageText)
             iterator = re.finditer(r"(?<=\bstats\s)(\w+)", messageText)

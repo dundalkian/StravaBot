@@ -66,7 +66,7 @@ def update_loop():
     threading.Timer(next_call-time.time(), update_loop).start()
 
 client = startupClient(email, password)
-data_handler.getRunners(client, client.uid, ThreadType.USER)
+data_handler.get_runners_list()
 data_handler.findChad(client)
 update_loop()
 client.listen()
