@@ -10,8 +10,7 @@ from prettytable import PrettyTable
 from fbchat import Client, log
 from fbchat.models import Message, ThreadType
 
-import data
-from StravaData import checkRunner, getStats, get_weekly_stats
+import data_handler
 
 email = os.environ['EMAIL']
 password = os.environ['PASSWORD']
