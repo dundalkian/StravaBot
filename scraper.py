@@ -46,7 +46,7 @@ def scrape_club_table(last_week=False):
     return leaderboard.find_elemens_by_tag_name("tr")
 
 # At this point I hate HTML a lot, so it works for now, not worth to fix.
-def getStats(Id):
+def get_stats(Id):
     url = "https://www.strava.com/athletes/" + str(Id)
     http_pool = urllib3.connection_from_url(url)
     r = http_pool.urlopen('GET',url)
@@ -74,12 +74,13 @@ def getStats(Id):
     return [final[1][1:-1], final[4][1:-1], final[6][2:-1], final[9][1:-1], final[12][1:-1]]
 
 
-def checkRunner(name_to_check, id_to_check):
+def check_runner(name_to_check, id_to_check):
     url = "https://www.strava.com/athletes/" + str(id_to_check)
     http_pool = urllib3.connection_from_url(url)
     r = http_pool.urlopen('GET',url)
 
     soup = BeautifulSoup(r.data.decode('utf-8'), 'html.parser')
+
 
     athlete = soup.find(class_='bottomless').string
 

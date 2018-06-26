@@ -29,7 +29,7 @@ def config(filename='database.ini', section='postgresql'):
     return db
 
 # This function is for testing db connection and is not used during normal operation
-def connect():
+def _connect():
     """ Connect to the PostgreSQL database server """
     conn = None
     try:
@@ -112,8 +112,9 @@ def update_db_club_table(last_week=False):
     new_stats_sql = """INSERT INTO {} (rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
     conn = None
     # weekly stats should be a list of lists each 7 elements in size,
-    # with the data expected in each tuple shown in the insert sql statement above
-    weekly_stats = data_handler.get_week_stats(last_week)
+    # with the data expected in each lower level list shown in the 
+    # insert sql statement above
+    weekly_stats = data_handler.parse_elements_from_table(last_week)
     try:
         # read database configuration
         params = config()
