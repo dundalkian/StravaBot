@@ -1,11 +1,10 @@
 import re
 from collections import Counter
 
-from fbchat.models import Message, ThreadType
+from fbchat.models import Message
 
-import scraper
-import bot
-import database
+from StravaBot import scraper
+from StravaBot import database
 
 help_text = '''
 Help for StravaBot:
@@ -20,24 +19,27 @@ strava id is the set of numbers on your profile page in the form https://www.str
 ## ghoul update chad
 will update the current chad and list the current one.
 ## ghoul (get) week
-displays this week's leaderboard from the A0BP strava club. (get) forces update of stats.  
+displays this week's leaderboard from the A0BP strava club. (get) forces update of stats.
 ## ghoul (get) last week
 displays last week's leaderboard from the A0BP strava club. (get) forces update of stats.
 '''
-####################################################
-### Top section is mainly for message processing ###
-####################################################
+#################################################
+# Top section is mainly for message processing #
+#################################################
+
+
 def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
     if author_id != StravaBot.uid:
         if re.search("(?i)help", messageText):
             return help_text
-        elif re.search("(?i)stats",messageText):
+        elif re.search("(?i)stats", messageText):
             print(messageText)
             iterator = re.finditer(r"(?<=\bstats\s)(\w+)", messageText)
             match = next(iterator)
             runner_name = match[0]
             if match[0] in StravaBot.all_runners.keys():
-                sendRunningStats(StravaBot, thread_id, thread_type, StravaBot.all_runners[runner_name], runner_name)
+                sendRunningStats(StravaBot, thread_id, thread_type,
+                                 StravaBot.all_runners[runner_name], runner_name)
             else:
                 return 'Looks like {} isn\'t in the system. :/'.format(runner_name)
         elif re.search("(?i)is (\w*?) a chad", messageText):
@@ -59,7 +61,7 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
                 for value in dict(StravaBot.all_runners).values():
                     print(value)
                 database_id = database.insert_runner(runner_name, strava_id)
-                if database_id != False:
+                if database_id:
                     StravaBot.all_runners = dict(database.get_runners_list())
                     return 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)
         elif '(?i)update chad' in messageText:
@@ -78,25 +80,29 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
         elif re.search("(?i)week", messageText):
             return get_ranking_name_and_distance(False, False)
 
+
 def sendRunningStats(StravaBot, thread_id, thread_type, athlete, athlete_name):
-    rex_stats = get_individual_stats(StravaBot.all_runners[StravaBot.current_running_chad])
+    rex_stats = get_individual_stats(
+        StravaBot.all_runners[StravaBot.current_running_chad])
     larry_stats = get_individual_stats(athlete)
-    compared_stats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(StravaBot.current_running_chad, rex_stats[0], athlete_name, larry_stats[0], StravaBot.current_running_chad, rex_stats[1], rex_stats[2],athlete_name, larry_stats[1], larry_stats[2], StravaBot.current_running_chad, rex_stats[3],athlete_name, larry_stats[3], StravaBot.current_running_chad, rex_stats[4],athlete_name, larry_stats[4])
+    compared_stats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(
+        StravaBot.current_running_chad, rex_stats[0], athlete_name, larry_stats[0], StravaBot.current_running_chad, rex_stats[1], rex_stats[2], athlete_name, larry_stats[1], larry_stats[2], StravaBot.current_running_chad, rex_stats[3], athlete_name, larry_stats[3], StravaBot.current_running_chad, rex_stats[4], athlete_name, larry_stats[4])
     return compared_stats
 
+
 def findChad(StravaBot):
-    bestTime = [0,'']
-    bestDistance = [0.0,'']
-    bestElevation = [0,'']
+    bestTime = [0, '']
+    bestDistance = [0.0, '']
+    bestElevation = [0, '']
     for runner in StravaBot.all_runners:
         runnerStats = get_individual_stats(StravaBot.all_runners[runner])
-        distance = float(runnerStats[0].replace(',',''))
+        distance = float(runnerStats[0].replace(',', ''))
         if distance > bestDistance[0]:
             bestDistance = [distance, runner]
-        time = int(runnerStats[1].replace(',',''))
+        time = int(runnerStats[1].replace(',', ''))
         if time > bestTime[0]:
             bestTime = [time, runner]
-        elevation = int(runnerStats[3].replace(',',''))
+        elevation = int(runnerStats[3].replace(',', ''))
         if elevation > bestElevation[0]:
             bestElevation = [elevation, runner]
     chadFinalists = Counter([bestTime[1], bestDistance[1], bestElevation[1]])
@@ -110,34 +116,42 @@ def findChad(StravaBot):
         print("Chad is {}".format(chadlist[0][0]))
         StravaBot.current_running_chad = chadlist[0][0]
 
+
 def runningChadCheck(StravaBot, athlete, athlete_name):
-    rex_stats = get_individual_stats(StravaBot.all_runners[StravaBot.current_running_chad])
+    rex_stats = get_individual_stats(
+        StravaBot.all_runners[StravaBot.current_running_chad])
     larry_stats = get_individual_stats(athlete)
     larryScore = 0
     response = 'I fucked up somehow, whoops'
-    if (int(larry_stats[1].replace(',','')) > int(rex_stats[1].replace(',',''))):
+    if (int(larry_stats[1].replace(',', '')) > int(rex_stats[1].replace(',', ''))):
         larryScore = larryScore + 1
-    if float(larry_stats[0].replace(',','')) > float(rex_stats[0].replace(',','')):
-        larryScore = larryScore + 1             
-    if (int(larry_stats[3].replace(',','')) > int(rex_stats[3].replace(',',''))):
+    if float(larry_stats[0].replace(',', '')) > float(rex_stats[0].replace(',', '')):
+        larryScore = larryScore + 1
+    if (int(larry_stats[3].replace(',', '')) > int(rex_stats[3].replace(',', ''))):
         larryScore = larryScore + 1
     if larryScore == 3:
-        response = 'Yes, {} is currently ahead in {}/3 categories.'.format(athlete_name, larryScore)
+        response = 'Yes, {} is currently ahead in {}/3 categories.'.format(
+            athlete_name, larryScore)
     else:
-        response = 'Not yet, {} is currently ahead in {}/3 categories.'.format(athlete_name, larryScore)
+        response = 'Not yet, {} is currently ahead in {}/3 categories.'.format(
+            athlete_name, larryScore)
     if athlete_name == StravaBot.current_running_chad:
         response = '{} is the current running chad.'.format(athlete_name)
     return response
+
 
 def getRunners(StravaBot, thread_id, thread_type):
     runners_list = get_runners_list()
     StravaBot.all_runners = dict(runners_list)
     print(StravaBot.all_runners)
-    StravaBot.send(Message(text = 'Refreshed runners list.'), thread_id = thread_id, thread_type=thread_type)
+    StravaBot.send(Message(text='Refreshed runners list.'),
+                   thread_id=thread_id, thread_type=thread_type)
 
-#################################################
-### Following lean more towards data handling ###
-#################################################
+#############################################
+# Following lean more towards data handling #
+#############################################
+
+
 def get_ranking_name_and_distance(update=False, last_week=False):
     """ This will give ranking by distance for the desired week as a string"""
     table = database.get_db_table(update, last_week)
@@ -149,11 +163,12 @@ def get_ranking_name_and_distance(update=False, last_week=False):
         miles = float(distance_str[0])*km_2_mi
         distance_str = "{:.1f} mi".format(miles)
         club_total_distance += miles
-        weekly_stats_string += "{}: {}\n".format(runner_stats[1],distance_str)
+        weekly_stats_string += "{}: {}\n".format(runner_stats[1], distance_str)
 
-
-    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(club_total_distance)
+    weekly_stats_string += "\nClub Miles: {:.1f} mi".format(
+        club_total_distance)
     return weekly_stats_string
+
 
 def update_tables():
     database.update_db_club_table(last_week=True)
@@ -162,22 +177,28 @@ def update_tables():
 
 # Takes in a list of 'tr' elements from the scraper module
 # and splits/organizes them into a standardized list
+
+
 def parse_elements_from_table(last_week=False):
     table_rows = scraper.scrape_club_table(last_week)
-    leaderboard_elements=[]
+    leaderboard_elements = []
     for row in table_rows:
-        leaderboard_elements.append(re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n', row.text))
-     # Remove header information of table, will also throw an error if no table exists
-    leaderboard_elements.pop(0) 
+        leaderboard_elements.append(
+            re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n', row.text))
+    # Remove header information of table, will also throw an error if no table exists
+    leaderboard_elements.pop(0)
     # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
     return leaderboard_elements
+
 
 def add_runner(name_to_check, id_to_check):
     runner_id = database.insert_runner(name_to_check, id_to_check)
     return runner_id
 
+
 def get_runners_list():
     return database.get_runners_list()
+
 
 def get_individual_stats(Id):
     return scraper.get_stats(Id)

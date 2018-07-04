@@ -1,10 +1,10 @@
 import os
 from configparser import ConfigParser
-from urllib import parse
 
 import psycopg2
 
 import data_handler
+
 
 def config(filename='database.ini', section='postgresql'):
     # create a parser
@@ -29,6 +29,8 @@ def config(filename='database.ini', section='postgresql'):
     return db
 
 # This function is for testing db connection and is not used during normal operation
+
+
 def _connect():
     """ Connect to the PostgreSQL database server """
     conn = None
@@ -61,6 +63,8 @@ def _connect():
             print('Database connection closed.')
 
 # (For reference and if I blow up prod db :yikes:)
+
+
 def insert_tables():
     commands = ["""
             CREATE TABLE last_weekly_stats (
@@ -103,6 +107,8 @@ def insert_tables():
 
 # Removing the previous data from the desired week's table
 # and inserting in the new data provided by the data_handler
+
+
 def update_db_club_table(last_week=False):
     if last_week:
         table_name = "last_weekly_stats"
@@ -112,7 +118,7 @@ def update_db_club_table(last_week=False):
     new_stats_sql = """INSERT INTO {} (rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
     conn = None
     # weekly stats should be a list of lists each 7 elements in size,
-    # with the data expected in each lower level list shown in the 
+    # with the data expected in each lower level list shown in the
     # insert sql statement above
     weekly_stats = data_handler.parse_elements_from_table(last_week)
     try:
@@ -139,6 +145,7 @@ def update_db_club_table(last_week=False):
 
     return
 
+
 def get_db_table(update=False, last_week=False):
     if update:
         update_db_club_table(last_week)
@@ -164,9 +171,11 @@ def get_db_table(update=False, last_week=False):
 
     return(club_weekly_table)
 
-# TODO 
-# Investigate methods of allowing user's to simply search 
+# TODO
+# Investigate methods of allowing user's to simply search
 # for their profiles rather than using the clunky athlete ID.
+
+
 def insert_runner(runner_name, runner_strava_id):
     sql = """INSERT INTO runners (runner_name, runner_strava_id) VALUES(%s, %s) RETURNING runner_id;"""
     conn = None
@@ -203,9 +212,9 @@ def get_runners_list():
         conn = psycopg2.connect(**params)
         cur = conn.cursor()
         cur.execute("SELECT runner_name, runner_strava_id FROM runners;")
-        #print("The number of runners: ", cur.rowcount)
+        # print("The number of runners: ", cur.rowcount)
         all_runners = cur.fetchall()
-        #print(all_runners)
+        # print(all_runners)
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
