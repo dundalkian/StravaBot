@@ -13,6 +13,7 @@ club_url = "https://www.strava.com/clubs/A0BP"
 # Check if testing locally (Will contain signin information later)
 parser = ConfigParser()
 parser.read('config.ini')
+local_test = False
 if parser.has_section('chromedriver'):
     local_test = True
 
