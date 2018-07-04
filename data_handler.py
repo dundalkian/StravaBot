@@ -64,6 +64,7 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
                 if database_id:
                     StravaBot.all_runners = dict(database.get_runners_list())
                     return 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)
+                return 'Fuck...'
         elif '(?i)update chad' in messageText:
             findChad(StravaBot)
             return 'Chad updated, running chad is {}'.format(StravaBot.current_running_chad)

@@ -26,9 +26,8 @@ def config(filename='config.ini', section='postgresql'):
             'Section {0} not found in the {1} file'.format(section, filename))
     return db
 
-# This function is for testing db connection and is not used during normal operation
 
-
+# Used for testing db connection, not used during normal operation
 def _connect():
     """ Connect to the PostgreSQL database server """
     conn = None
@@ -60,9 +59,8 @@ def _connect():
             conn.close()
             print('Database connection closed.')
 
+
 # (For reference and if I blow up prod db :yikes:)
-
-
 def insert_tables():
     commands = ["""
             CREATE TABLE last_weekly_stats (
@@ -103,10 +101,9 @@ def insert_tables():
         if conn is not None:
             conn.close()
 
+
 # Removing the previous data from the desired week's table
 # and inserting in the new data provided by the data_handler
-
-
 def update_db_club_table(new_table, last_week=False):
     if last_week:
         table_name = "last_weekly_stats"
@@ -140,7 +137,6 @@ def update_db_club_table(new_table, last_week=False):
     finally:
         if conn is not None:
             conn.close()
-
     return
 
 
