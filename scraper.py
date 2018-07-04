@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from StravaBot import data_handler
+import data_handler
 
 # Config #
 club_url = "https://www.strava.com/clubs/A0BP"

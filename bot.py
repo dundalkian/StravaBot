@@ -49,9 +49,6 @@ def startupClient(email, password):
     return client
 
 
-# Reving up the engines #
-
-
 next_call = time.time()
 
 
