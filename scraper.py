@@ -45,7 +45,7 @@ def scrape_club_table(last_week=False):
                                                       "div:nth-child(2) > div.leaderboard > "
                                                       "table")
     driver.quit()
-    return leaderboard.find_elemens_by_tag_name("tr")
+    return leaderboard.find_elements_by_tag_name("tr")
 
 # At this point I hate HTML a lot, so it works for now, not worth to fix.
 
