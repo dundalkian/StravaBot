@@ -144,9 +144,7 @@ def update_db_club_table(new_table, last_week=False):
     return
 
 
-def get_db_table(update=False, last_week=False):
-    if update:
-        update_db_club_table(last_week)
+def get_db_table(last_week=False):
     if last_week:
         table_name = "last_weekly_stats"
     else:

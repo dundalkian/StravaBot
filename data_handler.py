@@ -154,7 +154,9 @@ def getRunners(StravaBot, thread_id, thread_type):
 
 def get_ranking_name_and_distance(update=False, last_week=False):
     """ This will give ranking by distance for the desired week as a string"""
-    table = database.get_db_table(update, last_week)
+    if update:
+        update_tables()
+    table = database.get_db_table(last_week=last_week)
     weekly_stats_string = ""
     km_2_mi = 0.621371
     club_total_distance = 0.0
