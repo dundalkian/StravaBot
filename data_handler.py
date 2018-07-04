@@ -3,8 +3,8 @@ from collections import Counter
 
 from fbchat.models import Message
 
-from StravaBot import scraper
-from StravaBot import database
+import scraper
+import database
 
 help_text = '''
 Help for StravaBot:
