@@ -171,8 +171,8 @@ def get_ranking_name_and_distance(update=False, last_week=False):
 
 
 def update_tables():
-    last_week_table = parse_elements_from_table(last_week=True)
     this_week_table = parse_elements_from_table(last_week=False)
+    last_week_table = parse_elements_from_table(last_week=True)
     database.update_db_club_table(last_week_table, last_week=True)
     database.update_db_club_table(this_week_table, last_week=False)
 
@@ -180,15 +180,14 @@ def update_tables():
 # Takes in a list of 'tr' elements from the scraper module
 # and splits/organizes them into a standardized list
 def parse_elements_from_table(last_week=False):
-    table_rows = scraper.scrape_club_table(last_week)
-    leaderboard_elements = []
-    for row in table_rows:
-        leaderboard_elements.append(
-            re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n', row.text))
+    tr_elements = scraper.scrape_club_table(last_week)
+    leaderboard = []
+    for row in tr_elements:
+        leaderboard.append(re.split('(?<=\D)\s+(?=\d)|(?<=\d)\s+(?=\d)|\\n|(?<=m)\s+(?=-)', row))
     # Remove header information of table, will also throw an error if no table exists
-    leaderboard_elements.pop(0)
+    leaderboard.pop(0)
     # [Rank, Athlete, Distance, Runs, Longest, Avg. Pace, Elev. Gain] for reference
-    return leaderboard_elements
+    return leaderboard
 
 
 def add_runner(name_to_check, id_to_check):

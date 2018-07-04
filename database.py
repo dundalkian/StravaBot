@@ -4,9 +4,7 @@ from configparser import ConfigParser
 import psycopg2
 
 
-
-
-def config(filename='database.ini', section='postgresql'):
+def config(filename='config.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -115,7 +113,7 @@ def update_db_club_table(new_table, last_week=False):
     else:
         table_name = "weekly_stats"
     remove_stats_sql = """DELETE FROM {};""".format(table_name)
-    new_stats_sql = """INSERT INTO {} (rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
+    new_stats_sql = """INSERT INTO {} (rank, athlete, distance, num_runs, longest_run, avg_pace, elev_gain) VALUES(%s, %s, %s, %s, %s, %s, %s);""".format(table_name)
     conn = None
     # weekly stats should be a list of lists each 7 elements in size,
     # with the data expected in each lower level list shown in the
@@ -164,7 +162,7 @@ def get_db_table(update=False, last_week=False):
         club_weekly_table = cur.fetchall()
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        print("Error trying to get db table: {}".format(error))
     finally:
         if conn is not None:
             conn.close()

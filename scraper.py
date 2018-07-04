@@ -4,23 +4,36 @@ import urllib3
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from configparser import ConfigParser
 
 
 # Config #
 club_url = "https://www.strava.com/clubs/A0BP"
 
+# Check if testing locally (Will contain signin information later)
+parser = ConfigParser()
+parser.read('config.ini')
+if parser.has_section('chromedriver'):
+    local_test = True
+
 
 def scrape_club_table(last_week=False):
-    chrome_options = Options()
-    chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(executable_path=os.environ['CHROMEDRIVER_PATH'],
-                              chrome_options=chrome_options)
+    if local_test:
+        chrome_options = Options()
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(chrome_options=chrome_options)
+    else:
+        chrome_options = Options()
+        chrome_options.binary_location = os.environ['GOOGLE_CHROME_BIN']
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(executable_path=os.environ['CHROMEDRIVER_PATH'],
+                                  chrome_options=chrome_options)
     driver.get(club_url)
-
     if last_week:
         # Banner is in the way of clicking the last week button
         cookie_button_selector = "#stravaCookieBanner > div > button"
@@ -43,8 +56,13 @@ def scrape_club_table(last_week=False):
                                                       "div.leaderboard-page.tab-content > "
                                                       "div:nth-child(2) > div.leaderboard > "
                                                       "table")
+    tr_elements = []
+    for element in leaderboard.find_elements_by_tag_name("tr"):
+        tr_elements.append(element.text)
+
+    print(tr_elements)
     driver.quit()
-    return leaderboard.find_elements_by_tag_name("tr")
+    return tr_elements
 
 # At this point I hate HTML a lot, so it works for now, not worth to fix.
 
