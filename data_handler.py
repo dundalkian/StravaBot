@@ -171,14 +171,14 @@ def get_ranking_name_and_distance(update=False, last_week=False):
 
 
 def update_tables():
-    database.update_db_club_table(last_week=True)
-    database.update_db_club_table(last_week=False)
-    return
+    last_week_table = parse_elements_from_table(last_week=True)
+    this_week_table = parse_elements_from_table(last_week=False)
+    database.update_db_club_table(last_week_table, last_week=True)
+    database.update_db_club_table(this_week_table, last_week=False)
+
 
 # Takes in a list of 'tr' elements from the scraper module
 # and splits/organizes them into a standardized list
-
-
 def parse_elements_from_table(last_week=False):
     table_rows = scraper.scrape_club_table(last_week)
     leaderboard_elements = []
@@ -202,3 +202,6 @@ def get_runners_list():
 
 def get_individual_stats(Id):
     return scraper.get_stats(Id)
+
+
+update_tables()

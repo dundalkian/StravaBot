@@ -3,7 +3,7 @@ from configparser import ConfigParser
 
 import psycopg2
 
-import data_handler
+
 
 
 def config(filename='database.ini', section='postgresql'):
@@ -109,7 +109,7 @@ def insert_tables():
 # and inserting in the new data provided by the data_handler
 
 
-def update_db_club_table(last_week=False):
+def update_db_club_table(new_table, last_week=False):
     if last_week:
         table_name = "last_weekly_stats"
     else:
@@ -120,7 +120,7 @@ def update_db_club_table(last_week=False):
     # weekly stats should be a list of lists each 7 elements in size,
     # with the data expected in each lower level list shown in the
     # insert sql statement above
-    weekly_stats = data_handler.parse_elements_from_table(last_week)
+    weekly_stats = new_table
     try:
         # read database configuration
         params = config()

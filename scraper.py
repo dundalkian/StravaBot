@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-import data_handler
 
 # Config #
 club_url = "https://www.strava.com/clubs/A0BP"
