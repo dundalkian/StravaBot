@@ -172,6 +172,7 @@ def insert_runner(runner_name, runner_strava_id):
     sql = """INSERT INTO runners (runner_name, runner_strava_id) VALUES(%s, %s) RETURNING runner_id;"""
     conn = None
     runner_id = None
+    print('13')
     try:
         # read database configuration
         params = config()

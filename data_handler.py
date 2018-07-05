@@ -51,19 +51,28 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
 
         elif '(?i)add runner' in messageText:
             messageArray = messageText.split(' ')
+            print('1')
             runner_name = messageArray[3]
+            print('2')
             strava_id = messageArray[4]
+            print('3')
             if int(strava_id) in dict(StravaBot.all_runners).values():
+                print('4')
                 return '{} already added.'.format(runner_name)
             else:
+                print('5')
                 print(strava_id)
                 print('strava ID ^^^^')
                 for value in dict(StravaBot.all_runners).values():
+                    print('6')
                     print(value)
-                database_id = add_runner(runner_name, strava_id)
+                database_id = add_runner(runner_name.lower, strava_id)
+                print('7')
                 if database_id:
+                    print('8')
                     StravaBot.all_runners = dict(database.get_runners_list())
                     return 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)
+                print('9')
                 return 'Fuck...'
         elif '(?i)update chad' in messageText:
             findChad(StravaBot)
