@@ -107,10 +107,6 @@ def check_runner(name_to_check, id_to_check):
     athlete = soup.find(class_='bottomless').string
 
     if name_to_check in athlete.lower():
-        database_id = data_handler.add_runner(name_to_check, id_to_check)
-        if database_id:
-            return database_id
-        else:
-            return False
+        return True
     else:
         return False

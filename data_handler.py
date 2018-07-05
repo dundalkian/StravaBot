@@ -60,7 +60,7 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
                 print('strava ID ^^^^')
                 for value in dict(StravaBot.all_runners).values():
                     print(value)
-                database_id = database.insert_runner(runner_name, strava_id)
+                database_id = add_runner(runner_name, strava_id)
                 if database_id:
                     StravaBot.all_runners = dict(database.get_runners_list())
                     return 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)
@@ -194,8 +194,11 @@ def parse_elements_from_table(last_week=False):
 
 
 def add_runner(name_to_check, id_to_check):
-    runner_id = database.insert_runner(name_to_check, id_to_check)
-    return runner_id
+    if scraper.check_runner(name_to_check, id_to_check):
+        runner_id = database.insert_runner(name_to_check, id_to_check)
+        return runner_id
+    else:
+        return False
 
 
 def get_runners_list():
