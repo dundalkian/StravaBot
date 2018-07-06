@@ -27,6 +27,7 @@ class StravaBot(Client):
         if message_object.text is not None:
             messageText = message_object.text
             if re.match("(?i)ghoul", messageText):
+                print(messageText)
                 response = data_handler.process_message(self, author_id, messageText, thread_id, thread_type)
                 self.send(Message(text=response), thread_id, thread_type)
             else:
