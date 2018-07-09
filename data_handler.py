@@ -48,19 +48,19 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
             else:
                 return 'Looks like {} isn\'t in the system. :/'.format(name)
 
-        elif '(?i)add runner' in messageText:
+        elif re.search('(?i)add runner', messageText):
             messageArray = messageText.split(' ')
             runner_name = messageArray[3]
             strava_id = messageArray[4]
             if int(strava_id) in dict(StravaBot.all_runners).values():
                 return '{} already added.'.format(runner_name)
             else:
-                database_id = add_runner(runner_name.lower, strava_id)
+                database_id = add_runner(runner_name.lower(), strava_id)
                 if database_id:
                     StravaBot.all_runners = dict(database.get_runners_list())
                     return 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)
                 return 'Fuck...'
-        elif '(?i)update chad' in messageText:
+        elif re.search('(?i)update chad', messageText):
             findChad(StravaBot)
             return 'Chad updated, running chad is {}'.format(StravaBot.current_running_chad)
         # Ghoul get last week (not really intended to be used except for testing and if someone posts a run at 12:01)
@@ -75,6 +75,8 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
         # Ghoul week
         elif re.search("(?i)week", messageText):
             return get_ranking_name_and_distance(False, False)
+        else:
+            return "Sorry what?"
 
 
 def sendRunningStats(StravaBot, thread_id, thread_type, athlete, athlete_name):

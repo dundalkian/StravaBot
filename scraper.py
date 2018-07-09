@@ -101,13 +101,9 @@ def check_runner(name_to_check, id_to_check):
     url = "https://www.strava.com/athletes/" + str(id_to_check)
     http_pool = urllib3.connection_from_url(url)
     r = http_pool.urlopen('GET', url)
-    print('10')
     soup = BeautifulSoup(r.data.decode('utf-8'), 'html.parser')
-
     athlete = soup.find(class_='bottomless').string
-    print('11')
     if name_to_check in athlete.lower():
-        print('12')
         return True
     else:
         return False
