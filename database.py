@@ -215,4 +215,4 @@ def get_runners_list():
         if conn is not None:
             conn.close()
 
-    return(all_runners)
+    return dict(all_runners)

@@ -33,12 +33,11 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
         if re.search("(?i)help", messageText):
             return help_text
         elif re.search("(?i)stats", messageText):
-            print(messageText)
             iterator = re.finditer(r"(?<=\bstats\s)(\w+)", messageText)
             match = next(iterator)
             runner_name = match[0]
             if match[0] in StravaBot.all_runners.keys():
-                sendRunningStats(StravaBot, thread_id, thread_type,
+                return sendRunningStats(StravaBot, thread_id, thread_type,
                                  StravaBot.all_runners[runner_name], runner_name)
             else:
                 return 'Looks like {} isn\'t in the system. :/'.format(runner_name)
@@ -51,28 +50,15 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
 
         elif '(?i)add runner' in messageText:
             messageArray = messageText.split(' ')
-            print('1')
             runner_name = messageArray[3]
-            print('2')
             strava_id = messageArray[4]
-            print('3')
             if int(strava_id) in dict(StravaBot.all_runners).values():
-                print('4')
                 return '{} already added.'.format(runner_name)
             else:
-                print('5')
-                print(strava_id)
-                print('strava ID ^^^^')
-                for value in dict(StravaBot.all_runners).values():
-                    print('6')
-                    print(value)
                 database_id = add_runner(runner_name.lower, strava_id)
-                print('7')
                 if database_id:
-                    print('8')
                     StravaBot.all_runners = dict(database.get_runners_list())
                     return 'Added {} succesfully, runners list refreshed, id={}'.format(runner_name, database_id)
-                print('9')
                 return 'Fuck...'
         elif '(?i)update chad' in messageText:
             findChad(StravaBot)
@@ -92,8 +78,7 @@ def process_message(StravaBot, author_id, messageText, thread_id, thread_type):
 
 
 def sendRunningStats(StravaBot, thread_id, thread_type, athlete, athlete_name):
-    rex_stats = get_individual_stats(
-        StravaBot.all_runners[StravaBot.current_running_chad])
+    rex_stats = get_individual_stats(StravaBot.all_runners[StravaBot.current_running_chad])
     larry_stats = get_individual_stats(athlete)
     compared_stats = '{} has run {} miles.\n{} has run {} miles.\n\n{} has run for {}:{}.\n{} has run for {}:{}.\n\n{} has climbed {} feet.\n{} has climbed {} feet.\n\n{} has gone for {} runs.\n{} has gone for {} runs.'.format(
         StravaBot.current_running_chad, rex_stats[0], athlete_name, larry_stats[0], StravaBot.current_running_chad, rex_stats[1], rex_stats[2], athlete_name, larry_stats[1], larry_stats[2], StravaBot.current_running_chad, rex_stats[3], athlete_name, larry_stats[3], StravaBot.current_running_chad, rex_stats[4], athlete_name, larry_stats[4])
@@ -153,7 +138,6 @@ def runningChadCheck(StravaBot, athlete, athlete_name):
 def getRunners(StravaBot, thread_id, thread_type):
     runners_list = get_runners_list()
     StravaBot.all_runners = dict(runners_list)
-    print(StravaBot.all_runners)
     StravaBot.send(Message(text='Refreshed runners list.'),
                    thread_id=thread_id, thread_type=thread_type)
 
@@ -216,6 +200,3 @@ def get_runners_list():
 
 def get_individual_stats(Id):
     return scraper.get_stats(Id)
-
-
-update_tables()

@@ -4,15 +4,13 @@ import time
 import datetime
 import threading
 import re
+from configparser import ConfigParser
 
 from fbchat import Client
 from fbchat.models import Message, ThreadType
 
 # project imports
 import data_handler
-
-email = os.environ['EMAIL']
-password = os.environ['PASSWORD']
 
 
 class StravaBot(Client):
@@ -34,6 +32,27 @@ class StravaBot(Client):
                 # Sends the data to the inherited onMessage, so that we can still see when a message is recieved
                 super(StravaBot, self).onMessage(author_id=author_id, message_object=message_object,
                                                  thread_id=thread_id, thread_type=thread_type, **kwargs)
+
+
+def config(filename='config.ini', section='facebookcredentials'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section
+    creds = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            creds[param[0]] = param[1]
+    elif os.environ['EMAIL']:
+        creds['email'] = os.environ['EMAIL']
+        creds['password'] = os.environ['PASSWORD']
+    else:
+        raise Exception(
+            'Section {0} not found in the {1} file'.format(section, filename))
+    return creds
 
 
 def startupClient(email, password):
@@ -68,8 +87,10 @@ def update_loop():
     threading.Timer(next_call-time.time(), update_loop).start()
 
 
-client = startupClient(email, password)
-data_handler.get_runners_list()
+creds = config()
+client = startupClient(creds['email'], creds['password'])
+StravaBot.all_runners = data_handler.get_runners_list()
+print(StravaBot.all_runners)
 data_handler.findChad(client)
 update_loop()
 client.listen()
