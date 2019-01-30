@@ -24,7 +24,7 @@ class StravaBot(Client):
 
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         if message_object.text is not None:
-            messageText = message_object.text
+            messageText = message_object.text.lower()
             if re.match("(?i)ghoul", messageText):
                 processMessage(self, author_id, messageText, thread_id, thread_type)
             else:
